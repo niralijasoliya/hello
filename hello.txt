@@ -1,0 +1,562 @@
+Custom Theme
+
+Required files:
+To create theme
+index.php
+style.css
+page.php//for all pages
+single.php//for all post
+functions.php//its optional to implement functionality of theme
+
+--------------------------------------------------------------
+Create Multisite to ur website
+
+define('WP_ALLOW_MULTISITE',true); on wp-config file
+Note: Dectivate all plugin
+wp dashborad->tool menu
+ntework setup
+you get two code 1. use in .htaccess 2. wp-config file
+
+from main dashboard->setting->permalink->post
+
+create site
+------------------------------------------------------------
+Custom Post
+
+Plugin -> Custom Post Type UI 
+new post type -> give info
+hierarchical turn as true
+
+Plugin during post creation -> (Classic Editor)
+
+-----------------------------------------------------------
+Custom Plugin Code
+
+E:\xampp\htdocs\worddemo\wp-content\plugins
+create onr folder (give proper name)
+this folder name same as "Plugin Name" in code like "newplug".
+create one .php file with same name as folder name "newplug".
+
+for registartion page
+
+<?php
+global $mysqli;
+/*
+    Plugin Name: custPluginRegistration
+    Plugin URI: http://utu.ac.in
+    description: This is my custome plugin for registration of contestant.
+    Version: 1.0
+    Author: SRIMCA Students
+    Author URI: www.google.com
+    License: GPL2
+*/
+
+add_action('admin_menu', 'myfirstplugin');
+function myfirstplugin(){
+    add_menu_page(
+        'restaurant', //page title namespace
+        'My Registration', //Dashboard menu namespace
+        'administrator', //Capability
+        'set contestant data', //Slug name
+        'registration_plugin', //func name where we write inside coding
+        'dashicons-admin-tools', //display icon
+        '65' //position
+    );
+}
+
+function registration_plugin(){
+    echo '';
+?>
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+            <style type="text/css">
+                
+            </style>
+        </head>
+        <body>
+            <header style="margin-bottom: 4%;">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+                </nav>
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mt-2">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="smooth-scroll list-unstyled navbar-nav ml-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="http://localhost/HelloWP/indian-cooking-contest/">Register for Contest <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link" href="http://localhost/HelloWP/manage-contestant">Contest Info.</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="card" style="width: auto;">
+                <div class="card-body">
+                    <h3 class="card-title">Registration</h3>
+                    <!--<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>-->
+                    <form action="" method="post">
+                        <label for="fname">Name:</label><br>
+                        <input class="col-6 form-control" type="text" name="pName" required><br>
+                        <label for="lname">Mobile No.</label><br>
+                        <input class="col-6 form-control" type="text" name="mobile" required><br>
+                        <label for="lname">Email</label><br>
+                        <input class="col-6 form-control" type="text" name="email" required><br>
+                        <label for="contest">Contest Name</label><br>
+                        <input class="col-1" type="radio" name="contest" value="Indian Cooking Contest" required>Indian Cooking Contest<br>
+                        <input class="col-1" type="radio" name="contest" value="Amrit Cooking Contest" required>Amrit Cooking Contest<br><br>
+                        <label for="lname">Date of Birth</label><br>
+                        <input class="col-6 form-control" type="date" name="dob" required><br>
+                        <label for="lname">Profile Photo </label><br>
+                        <input class="col-6 form-control" type="file" name="profPic"><br>
+                        <input class="col-6 form-control btn btn-primary" name="regiCont" type="submit" data-toggle="modal" data-target="#exampleModal" value="Submit">
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registered Successfully</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        </body>
+    </html>
+<?php
+    if (isset($_POST['regiCont'])){
+        //echo '<pre>';
+        //print_r($_POST);
+        $pName = $_POST['pName'];
+        $mobile = $_POST['mobile'];
+        $email = $_POST['email'];
+        $dob = $_POST['dob'];
+        $contest = $_POST['contest'];
+
+        /*global $wpdb;
+            $wpdb -> insert(
+                contestuser, array(
+                    'contName' => $pName,
+                    'contMobileNo' => $mobile,
+                    'contEmail' => $email,
+                    'contestName' => $contest,
+                    'contDob' => $dob
+                )
+            );*/
+        $mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+        if(mysqli_connect_errno()){
+            printf("Error is: ", mysqli_connect_errno());
+        }
+        else{
+            $query = "INSERT INTO contestuser(contName, contMobileNo, contEmail, contestName, contDob)".
+            " VALUES('{$pName}', '{$mobile}', '{$email}', '{$contest}', '{$dob}')";
+            $addRecord = mysqli_query($mysqli, $query);
+            print('Success');
+            mysqli_close($mysqli);
+        }
+    }
+}
+
+function manage_contestant(){
+    $mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+    $query = "SELECT * FROM contestuser";
+    $tblData = mysqli_query($mysqli, $query);
+    if($tblData){
+        echo '<h3>List of Participants</h3><table><tr><th>Name of<br/>Participant</th><th>Contest</th><th>Apply<br/>Operation</th></tr>';
+        while($dataArr = mysqli_fetch_array($tblData, MYSQLI_ASSOC)){
+            echo '<tr><td>';
+            echo $dataArr['contName'] ."</td><td> ". $dataArr['contestName'] .'</td><td><a href="#">Edit</td></tr>';
+        }
+        echo '</table>';
+    }
+}
+
+function register_shortcodes(){
+    add_shortcode('formMaker', 'registration_plugin');
+    add_shortcode('contestManager', 'manage_contestant');
+}
+add_action('init', 'register_shortcodes');
+
+
+?>
+--------------------------------------------------------------------------
+
+for setting
+
+<?php
+global $mysqli;
+/*
+Plugin Name: PrcaticalContext
+Plugin URI: http://nav.co.in
+description: This is my custome plugin for registration of contestant.
+Version: 1.0
+Author: SRIMCA Students
+Author URI: www.google.com
+License: GPL2
+*/
+add_action('admin_menu', 'myfirstplugin');
+function myfirstplugin(){
+add_menu_page(
+'restaurant', //page title namespace
+'Contest Registration', //Dashboard menu namespace
+'administrator', //Capability
+'set contestant data', //Slug name
+'setting_page', //func name where we write inside coding
+'dashicons-media-document', //display icon
+'65' //position
+);
+add_submenu_page("set contestant data", "Content settings", "Content settings",
+1, "contentCust", "contentCustFunc");
+add_submenu_page("set contestant data", "Design settings", "Design settings", 0,
+"designCust", "designCustFunc");
+}
+function setting_page(){
+echo 'This is Navdip setting screen!';
+}
+function contentCustFunc(){
+echo '<h1>Content settings</h1>';
+echo '<div style="margin-left:17%;">
+<input class="form-check-input" type="checkbox" id="inlineCheckbox1"
+value="option1" />
+<label class="form-check-label" for="inlineCheckbox1">Display Age of the
+Participants</label><br/>
+<input class="form-check-input" type="checkbox" id="inlineCheckbox2"
+value="option1" />
+<label class="form-check-label" for="inlineCheckbox2">Display Profile photo
+of the Participants</label><br/>
+<button class="button button-info">Save change</button></div></div>';
+}
+function designCustFunc(){
+echo '<h1>Design settings</h1>';
+echo '<div style="margin-left:17%;">
+<h3>Color of text showing name of participant</h3>
+<label for="exampleColorInput" class="form-label">Color picker</label>
+<input type="color" class="form-control form-control-color"
+id="exampleColorInput" title="Choose your color">
+<h3>Background color of the participants details</h3>
+<label for="exampleColorInput" class="form-label">Color picker</label>
+<input type="color" class="form-control form-control-color"
+id="exampleColorInput" value="#ffffff" title="Choose your color">
+</div>';
+}
+function registration_plugin(){
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet"
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<script
+src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<style type="text/css"> <style>
+</head>
+<body>
+<header style="margin-bottom: 4%;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mt2">
+<div class="collapse navbar-collapse"
+id="navbarSupportedContent">
+<ul class="smooth-scroll list-unstyled navbar-nav ml-auto">
+<li class="nav-item active">
+<a class="nav-link"
+href="http://localhost/HelloWP/indian-cooking-contest/">Register for Contest <span
+class="sr-only">(current)</span></a>
+</li>
+<li class="nav-item active">
+<a class="nav-link"
+href="http://localhost/HelloWP/manage-contestant">Contest Info.</a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="card" style="width: auto;">
+<div class="card-body">
+<h3 class="card-title">Registration</h3>
+<form action="" method="post">
+<label for="fname">Name:</label><br>
+<input class="col-6 form-control" type="text" name="pName"
+required><br>
+<label for="lname">Mobile No.</label><br>
+<input class="col-6 form-control" type="text" name="mobile"
+required><br>
+<label for="lname">Email</label><br>
+<input class="col-6 form-control" type="text" name="email"
+required><br>
+<label for="contest">Contest Name</label><br>
+<input class="col-1" type="radio" name="contest"
+value="Indian Cooking Contest" required>Indian Cooking Contest<br>
+<input class="col-1" type="radio" name="contest" value="Amrit
+Cooking Contest" required>Amrit Cooking Contest<br><br>
+<label for="lname">Date of Birth</label><br>
+<input class="col-6 form-control" type="date" name="dob"
+required><br>
+<label for="lname">Profile Photo </label><br>
+<input class="col-6 form-control" type="file"
+name="profPic"><br>
+<input class="col-6 form-control btn btn-primary"
+name="regiCont" type="submit" data-toggle="modal" data-target="#exampleModal"
+value="Submit">
+</form>
+</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="exampleModalLabel">Registered
+Successfully</h5>
+<button type="button" class="close" data-dismiss="modal"
+aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
+<?php
+if (isset($_POST['regiCont'])){
+$pName = $_POST['pName'];
+$mobile = $_POST['mobile'];
+$email = $_POST['email'];
+$dob = $_POST['dob'];
+$contest = $_POST['contest'];
+$mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+if(mysqli_connect_errno()){
+printf("Error is: ", mysqli_connect_errno());
+}
+else{
+$query = "INSERT INTO contestuser(contName, contMobileNo, contEmail,
+contestName, contDob)".
+" VALUES('{$pName}', '{$mobile}', '{$email}', '{$contest}', '{$dob}')";
+$addRecord = mysqli_query($mysqli, $query);
+print('Success');
+mysqli_close($mysqli);
+}
+}
+}
+function manage_contestant(){
+$mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+$query = "SELECT * FROM contestuser";
+$tblData = mysqli_query($mysqli, $query);
+if($tblData){
+echo '<h3>List of Participants</h3><table><tr><th>Name
+of<br/>Participant</th><th>Contest</th><th>Apply<br/>Operation</th></tr>';
+while($dataArr = mysqli_fetch_array($tblData, MYSQLI_ASSOC)){
+echo '<tr><td>';
+echo $dataArr['contName'] ."</td><td> ". $dataArr['contestName']
+.'</td><td><a href="#">Edit</td></tr>';
+}
+echo '</table>';
+}
+}
+function register_shortcodes(){
+add_shortcode('formMaker', 'registration_plugin');
+add_shortcode('contestManager', 'manage_contestant');
+}
+add_action('init', 'register_shortcodes');
+?>
+-----------------------------------------------------------------
+
+same as above code
+
+<?php
+global $mysqli;
+/*
+    Plugin Name: custPluginRegistration
+    Plugin URI: http://nav.co.in
+    description: This is my custome plugin for registration of contestant.
+    Version: 1.0
+    Author: SRIMCA Students
+    Author URI: www.google.com
+    License: GPL2
+*/
+
+add_action('admin_menu', 'myfirstplugin');
+function myfirstplugin(){
+    add_menu_page(
+        'restaurant', //page title namespace
+        'Contest Registration', //Dashboard menu namespace
+        'administrator', //Capability
+        'set contestant data', //Slug name
+        'setting_page', //func name where we write inside (setting page) coding
+        'dashicons-media-document', //display icon
+        '65' //position
+    );
+
+    add_submenu_page("set contestant data", "Content settings", "Content settings", 1, "contentCust", "contentCustFunc");
+    add_submenu_page("set contestant data", "Design settings", "Design settings", 0, "designCust", "designCustFunc");
+}
+
+function setting_page(){
+    echo 'This is my setting screen!';
+}
+
+function contentCustFunc(){
+    echo '<h1>Content settings</h1>';
+    echo '<div style="margin-left:17%;">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" />
+        <label class="form-check-label" for="inlineCheckbox1">Display Age of the Participants</label><br/>
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option1" />
+        <label class="form-check-label" for="inlineCheckbox2">Display Profile photo of the Participants</label><br/>
+        <button class="button button-info">Save change</button></div></div>';
+}
+
+function designCustFunc(){
+    echo '<h1>Design settings</h1>';
+    echo '<div style="margin-left:17%;">
+        <h3>Color of text showing name of participant</h3>
+        <label for="exampleColorInput" class="form-label">Color picker</label>
+        <input type="color" class="form-control form-control-color" id="exampleColorInput" title="Choose your color">
+        <h3>Background color of the participants details</h3>
+        <label for="exampleColorInput" class="form-label">Color picker</label>
+        <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#ffffff" title="Choose your color">
+        </div>';
+}
+
+function registration_plugin(){
+    //echo '';
+?>
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+            <style type="text/css">
+                
+            </style>
+        </head>
+        <body>
+            <header style="margin-bottom: 4%;">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+                </nav>
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mt-2">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="smooth-scroll list-unstyled navbar-nav ml-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="http://localhost/HelloWP/indian-cooking-contest/">Register for Contest <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link" href="http://localhost/HelloWP/manage-contestant">Contest Info.</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="card" style="width: auto;">
+                <div class="card-body">
+                    <h3 class="card-title">Registration</h3>
+                    <!--<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>-->
+                    <form action="" method="post">
+                        <label for="fname">Name:</label><br>
+                        <input class="col-6 form-control" type="text" name="pName" required><br>
+                        <label for="lname">Mobile No.</label><br>
+                        <input class="col-6 form-control" type="text" name="mobile" required><br>
+                        <label for="lname">Email</label><br>
+                        <input class="col-6 form-control" type="text" name="email" required><br>
+                        <label for="contest">Contest Name</label><br>
+                        <input class="col-1" type="radio" name="contest" value="Indian Cooking Contest" required>Indian Cooking Contest<br>
+                        <input class="col-1" type="radio" name="contest" value="Amrit Cooking Contest" required>Amrit Cooking Contest<br><br>
+                        <label for="lname">Date of Birth</label><br>
+                        <input class="col-6 form-control" type="date" name="dob" required><br>
+                        <label for="lname">Profile Photo </label><br>
+                        <input class="col-6 form-control" type="file" name="profPic"><br>
+                        <input class="col-6 form-control btn btn-primary" name="regiCont" type="submit" data-toggle="modal" data-target="#exampleModal" value="Submit">
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registered Successfully</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        </body>
+    </html>
+<?php
+    if (isset($_POST['regiCont'])){
+        //echo '<pre>';
+        //print_r($_POST);
+        $pName = $_POST['pName'];
+        $mobile = $_POST['mobile'];
+        $email = $_POST['email'];
+        $dob = $_POST['dob'];
+        $contest = $_POST['contest'];
+
+        /*global $wpdb;
+            $wpdb -> insert(
+                contestuser, array(
+                    'contName' => $pName,
+                    'contMobileNo' => $mobile,
+                    'contEmail' => $email,
+                    'contestName' => $contest,
+                    'contDob' => $dob
+                )
+            );*/
+        $mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+        if(mysqli_connect_errno()){
+            printf("Error is: ", mysqli_connect_errno());
+        }
+        else{
+            $query = "INSERT INTO contestuser(contName, contMobileNo, contEmail, contestName, contDob)".
+            " VALUES('{$pName}', '{$mobile}', '{$email}', '{$contest}', '{$dob}')";
+            $addRecord = mysqli_query($mysqli, $query);
+            print('Success');
+            mysqli_close($mysqli);
+        }
+    }
+}
+
+function manage_contestant(){
+    $mysqli = mysqli_connect('localhost', 'root', '', 'wordpress');
+    $query = "SELECT * FROM contestuser";
+    $tblData = mysqli_query($mysqli, $query);
+    if($tblData){
+        echo '<h3>List of Participants</h3><table><tr><th>Name of<br/>Participant</th><th>Contest</th><th>Apply<br/>Operation</th></tr>';
+        while($dataArr = mysqli_fetch_array($tblData, MYSQLI_ASSOC)){
+            echo '<tr><td>';
+            echo $dataArr['contName'] ."</td><td> ". $dataArr['contestName'] .'</td><td><a href="#">Edit</td></tr>';
+        }
+        echo '</table>';
+    }
+}
+
+function register_shortcodes(){
+    add_shortcode('formMaker', 'registration_plugin');
+    add_shortcode('contestManager', 'manage_contestant');
+}
+add_action('init', 'register_shortcodes');
+
+
+?>
